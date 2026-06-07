@@ -77,3 +77,21 @@ export function getHistory(symbol: string): PricePoint[] {
   cache.set(symbol, hist);
   return hist;
 }
+
+export type DataSource = "sample" | "live";
+
+const liveCache = new Map<string, PricePoint[]>();
+
+// Fetches real market data via the server route. Throws on failure so callers
+// can fall back to sample data.
+export async function fetchLiveHistory(symbol: string): Promise<PricePoint[]> {
+  if (liveCache.has(symbol)) return liveCache.get(symbol)!;
+  const res = await fetch(`/api/public/quotes?symbol=${encodeURIComponent(symbol)}`);
+  if (!res.ok) throw new Error(`Live data unavailable (${res.status})`);
+  const json = (await res.json()) as { points?: PricePoint[]; error?: string };
+  if (!json.points || json.points.length < 60) {
+    throw new Error(json.error || "Live data unavailable");
+  }
+  liveCache.set(symbol, json.points);
+  return json.points;
+}
