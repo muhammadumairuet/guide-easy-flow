@@ -127,6 +127,7 @@ function momentumPredict(x: number[]): number {
 export async function runAnalysis(
   symbol: string,
   model: ModelKind,
+  dataSource: DataSource = "sample",
   onProgress?: (pct: number, msg: string) => void,
 ): Promise<AnalysisResult> {
   const step = (pct: number, msg: string) =>
@@ -136,7 +137,20 @@ export async function runAnalysis(
     });
 
   await step(10, `Loading ${symbol} price history…`);
-  const history = getHistory(symbol);
+  let history: PricePoint[];
+  let liveFallback = false;
+  if (dataSource === "live") {
+    try {
+      await step(18, "Fetching live market data…");
+      history = await fetchLiveHistory(symbol);
+    } catch {
+      liveFallback = true;
+      await step(18, "Live data unavailable — using sample data instead.");
+      history = getHistory(symbol);
+    }
+  } else {
+    history = getHistory(symbol);
+  }
 
   await step(30, "Engineering technical indicators (RSI, SMA, volatility)…");
   const { rows, closes } = buildFeatures(history);
