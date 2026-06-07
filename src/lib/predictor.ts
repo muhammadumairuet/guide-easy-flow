@@ -28,6 +28,8 @@ export interface AnalysisResult {
   equityCurve: { date: string; strategy: number; buyHold: number }[];
   confusion: { tp: number; tn: number; fp: number; fn: number };
   priceSeries: { date: string; close: number }[];
+  dataSource: DataSource;
+  liveFallback: boolean; // true if live was requested but sample was used
 }
 
 function sma(values: number[], i: number, n: number): number {
