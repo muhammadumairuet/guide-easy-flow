@@ -3,7 +3,7 @@
 // on technical-indicator features, plus a simple momentum model, metrics,
 // and a backtest of a long/flat trading strategy.
 
-import { getHistory, type PricePoint } from "./stock-data";
+import { getHistory, fetchLiveHistory, type DataSource, type PricePoint } from "./stock-data";
 
 export type ModelKind = "logistic" | "momentum";
 
