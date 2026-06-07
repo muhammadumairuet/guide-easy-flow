@@ -214,5 +214,7 @@ export async function runAnalysis(
     equityCurve,
     confusion: { tp, tn, fp, fn },
     priceSeries: history.slice(-90).map((p) => ({ date: p.date, close: p.close })),
+    dataSource,
+    liveFallback,
   };
 }
